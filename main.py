@@ -5,41 +5,39 @@
 # for - medlenny cikl,konechnyi
 # while - beskonechnyi,cikl s usloviemt
 # // napomny
-import webbrowser
-
 from time import sleep
 i = 0
 while i < 11:
-    sleep(0.3)
+    sleep(0.1)
     print(i)
     i += 1
-webbrowser.open('https://github.com/DanilProV-ctrl?tab=repositories')
+
 
 
 import pygame as pg
 
 level = [
-    '--------------------------',
-    '-                        -',
-    '-                        -',
-    '-                        -',
-    '-                        -',
-    '-                        -',
-    '-                        -',
-    '-                        -',
-    '-                        -',
-    '-                        - ',
-    '-                        - ',
-    '-                        - ',
-    '-                        - ',
-    '-                        - ',
-    '-                        - ',
-    '-                        - ',
-    '-                        - ',
-    '-                        - ',
-    '-                        - ',
-    '-                        - ',
-    '----------------------------'
+    '------------------------------------------------------------------------------------------------------------------------------------------------------------',
+    '-                                                 -                                                                                                        -',
+    '-                                              -                                                                                                           -',
+    '-                                                 -                                                                                                        -',
+    '-                                               -                                                                                                          -',
+    '-                                                 -                                                                                                        -',
+    '-                                               -                                                                                                          -',
+    '-                                                 -                                                                                                        -',
+    '-                                               -                                                                                                          -',
+    '-                                                                                                                                                          -',
+    '-                                                                                                                                                          -',
+    '-                                                                                                                                                          -',
+    '-                                                                                                                                                          -',
+    '-                                                                                                                                                          -',
+    '-                                                -                                                                                                          -',
+    '-                                                  -                                                                                                        -',
+    '-                                                -                                                                                                          -',
+    '-                                                  -                                                                                                       -',
+    '-                                                -                                                                                                         -',
+    '-                                                  -                                                                                                       -',
+    '------------------------------------------------------------------------------------------------------------------------------------------------------------'
 ]
 
 WIN_WIDTH, WIN_HEIGHT = 780, 630
@@ -48,16 +46,23 @@ BRICK_WIDTH = BRICK_HEIGHT = 30
 BRICK_COLOR = (10, 128, 100)
 FPS = 60
 clock = pg.time.Clock()
-x1, y1 = WIN_HEIGHT // 2, WIN_WIDTH // 2
-PLAER_SIZE = 50
+BG_SPEED = 0.3
+PLAER_SIZE = 40
+dx = 0
 
 pg.init()
-pg.display.set_caption('first game')
+# pg.display.set_caption('first game')
 screen = pg.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 
 player = pg.Surface((PLAER_SIZE, PLAER_SIZE))
 player.set_colorkey((0, 0, 0))
 # brick.fill(BRICK_COLOR)
+pg.draw.circle(player, (0, 0, 190), (PLAER_SIZE // 2, PLAER_SIZE // 2), PLAER_SIZE // 2)
+pg.draw.circle(player, (255, 215, 0), (12, 15), 4)
+pg.draw.circle(player, (255, 215, 0), (28, 15), 4)
+pg.draw.arc(player, (255, 215, 0), (8, 12, 24, 20), 3.6, 6.0, 3)
+player_rect = player.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2))
+
 
 run = True
 while run:
@@ -65,12 +70,20 @@ while run:
         if e.type == pg.QUIT or e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
             run = False
 
-
+    keys = pg.key.get_pressed()
+    if keys[pg.K_RIGHT]:
+        player_rect.x += 3
+    if keys[pg.K_LEFT]:
+        player_rect.x -= 3
+    if keys[pg.K_UP]:
+        player_rect.y -= 3
+    if keys[pg.K_DOWN]:
+        player_rect.y += 3
 
     screen.fill(BG_COLOR)
 
-
-    x = 0
+    dx -= BG_SPEED
+    x = dx
     y = 0
     for row in level:
         for col in row:
@@ -78,11 +91,13 @@ while run:
                 # screen.blit(brick, (x, y))
                 brick = pg.draw.rect(screen, BRICK_COLOR, [x, y, BRICK_WIDTH, BRICK_HEIGHT])
                 pg.draw.rect(screen, (0, 0, 0), [x, y, BRICK_WIDTH, BRICK_HEIGHT], 2)
+                if brick.colliderect(player_rect):
+                    print('!!!', end=', ')
             x += BRICK_WIDTH
         y += BRICK_HEIGHT
-        x = 0
+        x = dx
 
-    screen.blit(player, (x1, y1))
+    screen.blit(player, player_rect)
     pg.display.set_caption(f' FPS: {round(clock.get_fps(), 1)}')
     pg.display.update()
     clock.tick(FPS)
