@@ -48,15 +48,18 @@ BRICK_COLOR = (10, 128, 100)
 FPS = 60
 clock = pg.time.Clock()
 RED = (255, 0, 0)
-BG_SPEED = 1
+BG_SPEED = 3
 PLAER_SIZE = 40
 dx = 0
 PL_SPEED = 3
-penalty = 0
+penalty = 0.0
+BTN_W, BTN_H = 220, 60
 
 pg.init()
 # pg.display.set_caption('first game')
 screen = pg.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+
+
 
 player = pg.Surface((PLAER_SIZE, PLAER_SIZE))
 player.set_colorkey((0, 0, 0))
@@ -70,6 +73,13 @@ pg.draw.arc(player, (255, 215, 0), (8, 12, 24, 20), 3.6, 6.0, 3)
 player_rect = player.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2))
 
 txt = pg.font.SysFont('Sans Serif', 22, True, False)
+text_xy = ((WIN_WIDTH - txt.size(f'Штрафных очков = {round(penalty, 1)}')[0] - 300, 30),
+)
+
+button = pg.Surface((BTN_W, BTN_H))
+txte = pg.font.SysFont('Sans Serif', 22, True, False)
+text1 = 'Play again?'
+text1_pos = txte.size(text1)
 
 
 run = True
@@ -90,7 +100,13 @@ while run:
 
     screen.fill(BG_COLOR)
 
-    dx -= BG_SPEED
+    if dx > -WIN_WIDTH * 4:
+        dx -= BG_SPEED
+    else:
+        if player_rect.x < WIN_WIDTH - PLAER_SIZE:
+            player_rect.x += PL_SPEED
+            
+            
     x = dx
     y = 0
     for row in level:
@@ -109,9 +125,11 @@ while run:
     screen.blit(player, player_rect)
     pg.display.set_caption(f' FPS: {round(clock.get_fps(), 1)}')
     screen.blit(
-        txt.render(f'Штрафных очков = {penalty}', True, RED, None), 
-        (WIN_WIDTH - txt.size(f'Штрафных очков = {round(penalty, 1)}')[0] - 5, 30),
-    )
+        txt.render(f'Штрафных очков = {penalty}', True, RED, None), text_xy)
+        
+
+
+    
 
     pg.display.update()
     clock.tick(FPS)
