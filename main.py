@@ -15,6 +15,7 @@ while i < 11:
 
 
 import pygame as pg
+from pygame import gfxdraw
 
 level = [
     '----------------------------------------------------------------------------------------------------------------------------------------------------------------',
@@ -60,8 +61,8 @@ penalty = 0.0
 BTN_W, BTN_H = 220, 60
 GOLD = (255, 215, 0)
 BLUE = (0, 0, 190)
-
-
+RED1 = (200, 50, 50)
+WHITE = (255, 255, 255)
 pg.init()
 # pg.display.set_caption('first game')
 screen = pg.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
@@ -73,10 +74,12 @@ player.set_colorkey((0, 0, 0))
 
 
 def face(color):
-    pg.draw.aacircle(player, color, (PLAER_SIZE // 2, PLAER_SIZE // 2), PLAER_SIZE // 2)
-    pg.draw.circle(player, GOLD, (12, 15), 4)
-    pg.draw.circle(player, (0, 0, 190), (8, 3), 8) 
-    pg.draw.circle(player, (0, 0, 190), (30, 3), 8) 
+    pg.gfxdraw.aacircle(player, PLAER_SIZE // 2, PLAER_SIZE // 2, PLAER_SIZE // 2, color)
+    pg.draw.circle(player, color, (PLAER_SIZE // 2, PLAER_SIZE // 2), PLAER_SIZE // 2)
+    pg.gfxdraw.aacircle(player, 12, 15, 4, GOLD)
+    pg.draw.circle(player, RED1, (12, 15), 4)
+    pg.draw.circle(player, (0, 0, 190), (8, 3), 8)
+    pg.draw.circle(player, (0, 0, 190), (30, 3), 8)
     pg.draw.circle(player, GOLD, (28, 15), 4)
     pg.draw.arc(player, GOLD, (8, 12, 24, 20), 3.6, 6.0, 3)
     pg.draw.arc(player, (150, 150, 150), (6, 19, 29, 20), 3.6, 6.0, 3)
@@ -85,19 +88,21 @@ def face(color):
 player_rect = player.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2))
 txt = pg.font.SysFont('Arial', 18, True, True)
 text_xy = ((WIN_WIDTH - txt.size(f'Штрафных очков = {penalty}')[0] - 300, 3),
+
 )
 
 
-text_xy1 = ((WIN_WIDTH - txt.size(f'Created by Dan')[0] - 25, 600), 
-)
+
 
 
 button = pg.Surface((BTN_W, BTN_H))
+button.fill(BLUE)
 txte = pg.font.SysFont('Arial', 22, True, False)
 text1 = 'Play again?'
 text1_pos = txte.size(text1)
 
-
+color = BLUE
+face(color)
 run = True
 while run:
     for e in pg.event.get():
@@ -113,16 +118,18 @@ while run:
         player_rect.y -= PL_SPEED
     if keys[pg.K_DOWN]:
         player_rect.y += PL_SPEED
+    if color == RED:
+        color = BLUE
+        face(color)
 
     screen.fill(BG_COLOR)
-    face(BLUE)
     if dx > -WIN_WIDTH * 4:
         dx -= BG_SPEED
     else:
         if player_rect.x < WIN_WIDTH - PLAER_SIZE:
             player_rect.x += PL_SPEED
 
-           
+
     x = dx
     y = 0
     for row in level:
@@ -132,13 +139,17 @@ while run:
                 brick = pg.draw.rect(screen, BRICK_COLOR, [x, y, BRICK_WIDTH, BRICK_HEIGHT])
                 pg.draw.rect(screen, BRICK_COLOR_2, [x, y, BRICK_WIDTH, BRICK_HEIGHT], 2)
                 if brick.colliderect(player_rect):
-                    face(RED)
+                    if color == BLUE:
+                        color = RED
+                        face(color)
                     penalty += 0.1
             if col == "!":
                 brick1 = pg.draw.rect(screen, BRICK1_COLOR, [x, y, BRICK1_WIDTH, BRICK1_HEIGHT])
                 pg.draw.rect(screen, BRICK1_COLOR_1, [x, y, BRICK1_WIDTH, BRICK1_HEIGHT], 2)
-                if brick1.colliderect(player_rect):
-                    face(RED)
+                if brick1.colliderect(player_rect):                   
+                    if color == BLUE:
+                        color = RED
+                        face(color)
                     player_rect.x -= PL_SPEED
                     player_rect.y -= 1
                     penalty += 0.5
@@ -146,14 +157,21 @@ while run:
         y += BRICK_HEIGHT
         x = dx
 
-    screen.blit(player, player_rect)
-    pg.display.set_caption(f' FPS: {round(clock.get_fps(), 1)}')
-    screen.blit(
-        txt.render(f'penalty point = {round(penalty, 1)}', True, RED, None), text_xy
-    )  
-    screen.blit(
-        txt.render(f'Created by Danil', True, RED, None), text_xy1
-    )
 
+    if player_rect.x < WIN_WIDTH - PLAER_SIZE:
+        screen.blit(player, player_rect)
+        pg.display.set_caption(f' FPS: {round(clock.get_fps(), 1)}')
+        screen.blit(
+            txt.render(f'penalty point = {round(penalty, 1)}', True, RED, None), text_xy
+        )
+    else:
+        screen.blit(button, ((WIN_WIDTH - BTN_W) // 2, WIN_HEIGHT // 2))
+        button.blit(
+            txt.render(text1, True, WHITE, None),
+            ((BTN_W - text1_pos[0]) // 2, (BTN_H - text1_pos[1]) // 2))
+        screen.blit(
+            txt.render(f'penalty point = {round(penalty, 1)}', True, RED, None),
+            ((WIN_WIDTH - txte.size(f'penalty point = {round(penalty, 1)}')[0]) // 2,
+             WIN_HEIGHT // 2 - BTN_H))
     pg.display.update()
     clock.tick(FPS)
