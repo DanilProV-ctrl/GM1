@@ -86,7 +86,7 @@ def face(color):
 
 
 player_rect = player.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2))
-txt = pg.font.SysFont('Arial', 18, True, True)
+txt = pg.font.SysFont('Arial', 22, True, True)
 text_xy = ((WIN_WIDTH - txt.size(f'Штрафных очков = {penalty}')[0] - 300, 3),
 
 )
@@ -108,6 +108,14 @@ while run:
     for e in pg.event.get():
         if e.type == pg.QUIT or e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
             run = False
+        elif e.type == pg.MOUSEBUTTONDOWN:
+            if e.button == 1:
+                mouse_position = pg.mouse.get_pos()
+                if (mouse_position[0] >= 280
+                    and mouse_position[0] <= 500
+                    and mouse_position[1] >= WIN_HEIGHT // 2
+                    and mouse_position[1] <= WIN_HEIGHT // 2 + BTN_H):
+                        print(101010)
 
     keys = pg.key.get_pressed()
     if keys[pg.K_RIGHT]:
@@ -139,20 +147,11 @@ while run:
                 brick = pg.draw.rect(screen, BRICK_COLOR, [x, y, BRICK_WIDTH, BRICK_HEIGHT])
                 pg.draw.rect(screen, BRICK_COLOR_2, [x, y, BRICK_WIDTH, BRICK_HEIGHT], 2)
                 if brick.colliderect(player_rect):
-                    if color == BLUE:
-                        color = RED
-                        face(color)
-                    penalty += 0.1
-            if col == "!":
-                brick1 = pg.draw.rect(screen, BRICK1_COLOR, [x, y, BRICK1_WIDTH, BRICK1_HEIGHT])
-                pg.draw.rect(screen, BRICK1_COLOR_1, [x, y, BRICK1_WIDTH, BRICK1_HEIGHT], 2)
-                if brick1.colliderect(player_rect):                   
-                    if color == BLUE:
-                        color = RED
-                        face(color)
-                    player_rect.x -= PL_SPEED
-                    player_rect.y -= 1
-                    penalty += 0.5
+                    if player_rect.x < WIN_WIDTH - PLAER_SIZE * 2:
+                        if color == BLUE:
+                            color = RED
+                            face(color)
+                        penalty += 0.1
             x += BRICK_WIDTH
         y += BRICK_HEIGHT
         x = dx
